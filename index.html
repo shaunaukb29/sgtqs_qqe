@@ -16,22 +16,34 @@
   </div>
   <script type="module" src="https://gradio.s3-us-west-2.amazonaws.com/5.38.0/gradio.js"></script>
   <script>
-    function hideFooter() {
-      const app = document.querySelector('gradio-app');
-      if (!app) return;
+  function injectFooterHide(root) {
+    if (root.querySelector('#gradio-footer-style')) return; // already injected
+    const style = document.createElement('style');
+    style.id = 'gradio-footer-style';
+    style.textContent = `
+      footer { display: none !important; }
+      .built-with { display: none !important; }
+      #footer { display: none !important; }
+    `;
+    root.appendChild(style);
+  }
+
+  function watchApp() {
+    const app = document.querySelector('gradio-app');
+    if (!app) { setTimeout(watchApp, 300); return; }
+
+    const observer = new MutationObserver(() => {
       const root = app.shadowRoot;
-      if (!root) return;
-      const style = document.createElement('style');
-      style.textContent = 'footer { display: none !important; }';
-      root.appendChild(style);
-    }
-    const interval = setInterval(() => {
-      const app = document.querySelector('gradio-app');
-      if (app && app.shadowRoot) {
-        hideFooter();
-        clearInterval(interval);
-      }
-    }, 300);
-  </script>
+      if (root) injectFooterHide(root);
+    });
+
+    observer.observe(app, { childList: true, subtree: true });
+
+    // Also try immediately in case shadow root already exists
+    if (app.shadowRoot) injectFooterHide(app.shadowRoot);
+  }
+
+  watchApp();
+</script>
 </body>
 </html>
