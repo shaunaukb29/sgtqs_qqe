@@ -6,33 +6,29 @@
   <title>Golden Seas App</title>
   <style>
     html, body { margin:0; padding:0; height:100%; width:100%; font-family:sans-serif; background:#0f1117; color:#fff; }
-    .gradio-wrapper { width:100%; height:100%; display:flex; justify-content:center; align-items:center; }
-    gradio-app { width:100%; height:100%; border:none; visibility:hidden; }
+    .gradio-wrapper {
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+    iframe {
+      width: 100%;
+      height: calc(100% + 60px); /* extra height to push footer out of view */
+      border: none;
+      display: block;
+      margin-bottom: -60px; /* crop the footer off the bottom */
+    }
   </style>
 </head>
 <body>
   <div class="gradio-wrapper">
-    <gradio-app space="x748873y/sfss511"></gradio-app>
+    <iframe
+      src="https://x748873y-sfss511.hf.space"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
+      title="Golden Seas App"
+      loading="lazy"
+    ></iframe>
   </div>
-  <script type="module" src="https://gradio.s3-us-west-2.amazonaws.com/5.38.0/gradio.js"></script>
-  <script>
-    function nukeFooter() {
-      const app = document.querySelector('gradio-app');
-      if (!app) return;
-
-      const root = app.shadowRoot;
-      if (root) {
-        root.querySelectorAll('footer, .built-with, [class*="footer"], [id*="footer"]')
-          .forEach(el => el.style.setProperty('display', 'none', 'important'));
-      }
-
-      document.querySelectorAll('footer, .built-with, [class*="footer"], [id*="footer"]')
-        .forEach(el => el.style.setProperty('display', 'none', 'important'));
-
-      app.style.visibility = 'visible';
-    }
-
-    setInterval(nukeFooter, 200);
-  </script>
 </body>
 </html>
