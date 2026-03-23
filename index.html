@@ -7,7 +7,7 @@
   <style>
     html, body { margin:0; padding:0; height:100%; width:100%; font-family:sans-serif; background:#0f1117; color:#fff; }
     .gradio-wrapper { width:100%; height:100%; display:flex; justify-content:center; align-items:center; }
-    gradio-app { width:100%; height:100%; border:none; }
+    gradio-app { width:100%; height:100%; border:none; visibility:hidden; }
   </style>
 </head>
 <body>
@@ -16,34 +16,23 @@
   </div>
   <script type="module" src="https://gradio.s3-us-west-2.amazonaws.com/5.38.0/gradio.js"></script>
   <script>
-  function injectFooterHide(root) {
-    if (root.querySelector('#gradio-footer-style')) return; // already injected
-    const style = document.createElement('style');
-    style.id = 'gradio-footer-style';
-    style.textContent = `
-      footer { display: none !important; }
-      .built-with { display: none !important; }
-      #footer { display: none !important; }
-    `;
-    root.appendChild(style);
-  }
+    function nukeFooter() {
+      const app = document.querySelector('gradio-app');
+      if (!app) return;
 
-  function watchApp() {
-    const app = document.querySelector('gradio-app');
-    if (!app) { setTimeout(watchApp, 300); return; }
-
-    const observer = new MutationObserver(() => {
       const root = app.shadowRoot;
-      if (root) injectFooterHide(root);
-    });
+      if (root) {
+        root.querySelectorAll('footer, .built-with, [class*="footer"], [id*="footer"]')
+          .forEach(el => el.style.setProperty('display', 'none', 'important'));
+      }
 
-    observer.observe(app, { childList: true, subtree: true });
+      document.querySelectorAll('footer, .built-with, [class*="footer"], [id*="footer"]')
+        .forEach(el => el.style.setProperty('display', 'none', 'important'));
 
-    // Also try immediately in case shadow root already exists
-    if (app.shadowRoot) injectFooterHide(app.shadowRoot);
-  }
+      app.style.visibility = 'visible';
+    }
 
-  watchApp();
-</script>
+    setInterval(nukeFooter, 200);
+  </script>
 </body>
 </html>
